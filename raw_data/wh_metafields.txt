@@ -1,0 +1,17 @@
+Metadata descriptions:
+
+wh data contains snapshots of archive.org for waho locations.
+
+store_code: internal reference of unique id for stores
+business_name: full name from pull
+city: city in caps
+state: state code
+latitude: numeric standard
+longitude: numeric standard
+status_code: flag; A = Operating Normally, CT = Closed Temporarily
+business_hours_json: json of standard operating hours
+formatted_business_hours: created text field for my analysis to identify non 24 hour wahos
+special_hours_json: json of temporary change in business hours
+custom_json: returned json from notes field, seems to denote franchisee owner
+closed_reason: returned in the data pull but only returns NA, likely defunct
+snapshot_date: snapshot from archive

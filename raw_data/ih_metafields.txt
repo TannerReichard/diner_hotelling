@@ -1,0 +1,13 @@
+IH Metadata descriptions:
+
+ih data contains snapshots of archive.org for ih locations page, but is much more incomplete than wh
+
+status: string, Current/Closed
+state: full name
+city: full name only first letter capitalized
+address: full street address
+note: field returns empty, probably need to bash this one around a bit
+loc_raw: loc used for geospatial tagging
+full_address: combining for tagging
+latitude: numeric, has some NAs due to tidy tagging mishaps
+longitude: numeric, has some NAs due to tidy tagging mishaps
