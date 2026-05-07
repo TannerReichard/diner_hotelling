@@ -1,4 +1,4 @@
-Metadata descriptions:
+WH Metadata descriptions:
 
 wh data contains snapshots of archive.org for waho locations.
 
@@ -15,3 +15,6 @@ special_hours_json: json of temporary change in business hours
 custom_json: returned json from notes field, seems to denote franchisee owner
 closed_reason: returned in the data pull but only returns NA, likely defunct
 snapshot_date: snapshot from archive
+state_fips: state signifier
+cz_fips: county signifier
+county: named county
