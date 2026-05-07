@@ -1,6 +1,3 @@
-# ok use this to clean things up ###################
-####################################################
-
 #libraries and helpers 
 library(httr)
 library(jsonlite)
@@ -11,6 +8,8 @@ library(lubridate)
 library(leaflet)
 library(readxl)
 library(tidyr)
+library(tigris)
+library(sf)
 
 # if left hand side is null then return right side, need this for weird pulls from archive
 `%||%` <- function(x, y) {
@@ -24,8 +23,7 @@ sorted_table <- function(x){
     arrange(desc(Freq))
 }
 
-# main pull #####################################
-#################################################
+# main pull #
 
 #loads in snapshots by day and gets archive_url to feed next section
 
@@ -68,13 +66,13 @@ get_wayback_snapshots_daily <- function(
 }
 
 #before this date things start to get funky with the archives
+
 targets_daily <- get_wayback_snapshots_daily(
   from = "20230801"
 )
 
 
-#parsing function ############################
-##############################################
+#parsing function ####
 
 parse_waffle_snapshot_url <- function(archive_url) {
   res <- httr::GET(
@@ -139,8 +137,7 @@ parse_waffle_snapshot_url <- function(archive_url) {
     )
 }
 
-# end function start parsing ##########################
-#######################################################
+# end function start parsing ####
 
 safe_parse <- purrr::possibly(parse_waffle_snapshot_url, otherwise = NULL)
 
@@ -164,13 +161,55 @@ hist_locs <- purrr::map2_dfr(out,
 
 
 
-# exploring section #################################
-####################################################
 
-hist_locs |>
-  dplyr::count(snapshot_date, status_code) |>
-  tidyr::pivot_wider(
-    names_from = status_code,
-    values_from = n,
-    values_fill = 0
-  ) %>% as.data.frame()
+city_county_ref_one <- places_sf %>%
+  st_join(
+    counties_sf,
+    join = st_intersects,
+    left = FALSE
+  ) %>%
+  mutate(overlap_area = as.numeric(st_area(geometry))) %>% 
+  st_drop_geometry() %>%
+  transmute(
+    city,
+    state_fips = state_fips.x,
+    county,
+    cz_fips,
+    overlap_area
+  ) %>%
+  group_by(city, state_fips) %>%
+  slice_max(overlap_area, n = 1, with_ties = FALSE) %>%
+  ungroup() %>%
+  select(city, state_fips, county, cz_fips)
+
+
+waho_city_keys <- waho2 %>%
+  distinct(city, state_fips)
+
+places_needed <- places_sf %>%
+  semi_join(waho_city_keys, by = c("city", "state_fips"))
+
+city_county_ref_one <- places_needed %>%
+  st_point_on_surface() %>%
+  st_join(
+    counties_sf,
+    join = st_intersects,
+    left = FALSE
+  ) %>%
+  st_drop_geometry() %>%
+  transmute(
+    city,
+    state_fips = state_fips.x,
+    county,
+    cz_fips
+  ) %>%
+  distinct(city, state_fips, .keep_all = TRUE)
+
+waho_final <- hist_locs %>%
+  left_join(
+    city_county_ref_one,
+    by = c("city", "state_fips")
+  )
+
+
+write.csv(waho_final, "raw_wh_data.csv", row.names = F)
