@@ -71,3 +71,12 @@ ihop_geo <- ihop_locations %>%
 
 nrow(ihop_locations)
 head(ihop_locations)
+
+counties_sf <- counties(cb = TRUE, year = 2023) %>%
+  st_transform(4326) %>%
+  select(
+    state_fips = STATEFP,
+    cz_fips = COUNTYFP,
+    county = NAME,
+    geometry
+  )
