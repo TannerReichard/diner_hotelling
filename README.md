@@ -12,3 +12,5 @@ From a conjecture standpoint, there are enough anecdotal instances of this pheno
 Ideally, augmented historical data, where available, will also show us examples of the law in action. For instance, if waffle house opens a new location, does an ihop also open nearby?
 
 This will be an ongoing project and multiple diner chains will be added for analysis.
+
+Added updates for state/county tagging
